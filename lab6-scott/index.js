@@ -13,7 +13,7 @@ server.on('connection', (socket) => {
   //this set the new socket object inside the clientPool array while keeping any previous objects in the array.
   clientPool = [...clientPool, socket];
 
-  //this will log a message of the user that left and remove the user from the clientPool. This is invoked if the user timesout, leaves, or errors.
+  //this will log a message of the user that left and remove the user from the clientPool. This is invoked if the user timesout, leaves, quits, or errors.
   let handleDisconnect = () => {
     console.log(`${socket.username} has vanished`);
     clientPool = clientPool.filter(item => item !== socket);
@@ -38,12 +38,10 @@ server.on('connection', (socket) => {
       console.log(`recipient: `, recipient);
       let message = data.slice(data.indexOf(' ', 5));
       console.log(`message: `, message);
-      for (var i = 0; i < clientPool.length; i++) {
-        if (clientPool.username === recipient) {
-          socket.username = recipient;
-          socket.write(message);
-        }
-      }
+      console.log(`socket username: `, socket.username);
+      let recipientToWrite = clientPool.filter(recipient);
+      console.log(`recipientpool username: `, recipientToWrite.username);
+      recipientToWrite.write(message);
     }
     //this allows the user to type /quit and it will end the connection and remove them from the clientPool
     else if (data.startsWith('/quit')) {
@@ -54,7 +52,6 @@ server.on('connection', (socket) => {
     else if (data.startsWith('/menu')) {
       socket.write(`:MENU:\nChanging your username\n/nick yourNewNameHere\n\nSending a direct message:\n/dm recipientUserName yourMessage\n\nQuit the chatroom:\n/quit\n\nEnjoy!`);
     }
-  });
     //this prints the chat message to all users
     clientPool.forEach(item => item.write(`${socket.username}: ${data}`));
   });
