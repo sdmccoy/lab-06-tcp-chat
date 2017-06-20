@@ -31,15 +31,9 @@ server.on('connection', (socket) => {
       socket.username = socket.username.trim();
       socket.write(`You are now known as ${socket.username}!`);
       return;
-    } else {
-      //this will put the username infront of everything the user types
-      socket.write(`${socket.username}: ${buffer}`);
     }
-  });
     //this allows the user to dm another user by nickname with the following syntax   /dm username message
-  socket.on('data', (buffer) => {
-    let data = buffer.toString();
-    if (data.startsWith('/dm')) {
+    else if (data.startsWith('/dm')) {
       let recipient = data.split(' ')[1].toString();
       console.log(`recipient: `, recipient);
       let message = data.slice(data.indexOf(' ', 5));
@@ -51,21 +45,18 @@ server.on('connection', (socket) => {
         }
       }
     }
-  });
-  //this allows the user to type /quit and it will end the connection and remove them from the clientPool
-  socket.on('data', (buffer) => {
-    let data = buffer.toString();
-    if (data.startsWith('/quit')) {
+    //this allows the user to type /quit and it will end the connection and remove them from the clientPool
+    else if (data.startsWith('/quit')) {
       socket.end();
       return handleDisconnect;
     }
-  });
-  //this prints the user a menu of commands to use
-  socket.on('data', (buffer) => {
-    let data = buffer.toString();
-    if (data.startsWith('/menu')) {
+    //this prints the user a menu of commands to use
+    else if (data.startsWith('/menu')) {
       socket.write(`:MENU:\nChanging your username\n/nick yourNewNameHere\n\nSending a direct message:\n/dm recipientUserName yourMessage\n\nQuit the chatroom:\n/quit\n\nEnjoy!`);
     }
+  });
+    //this prints the chat message to all users
+    clientPool.forEach(item => item.write(`${socket.username}: ${data}`));
   });
 });
 
