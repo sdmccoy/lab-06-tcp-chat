@@ -7,7 +7,7 @@ let clientPool = [];
 
 server.on('connection', (socket) => {
   //sets a random number between 1000&1 to a username property so we can identify the user
-  socket.username = `Name: ${Math.floor(Math.random() * (1000 - 1)) + 1}`;
+  socket.username = `${Math.floor(Math.random() * (1000 - 1)) + 1}`;
   console.log('user connected', socket.username);
   socket.write(`You're connected!\nYour username is ${socket.username}\nTo change it type /nick newname`);
   //this set the new socket object inside the clientPool array while keeping any previous objects in the array.
@@ -30,6 +30,8 @@ server.on('connection', (socket) => {
       socket.username = socket.username.trim();
       socket.write(`You are now known as ${socket.username}!`);
       return;
+    } else {
+      socket.write(`${socket.username}: ${buffer}`);
     }
     //this allows the user to dm another user by nickname with the following syntax   /dm username message
     socket.on('data', (buffer) => {
@@ -46,7 +48,7 @@ server.on('connection', (socket) => {
         }
       }
     });
-
+    //this will put the username infront of everything the user types
   });
 
 });
