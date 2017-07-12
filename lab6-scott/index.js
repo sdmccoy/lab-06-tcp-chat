@@ -33,7 +33,7 @@ server.on('connection', (socket) => {
       return;
     }
     //this allows the user to dm another user by nickname with the following syntax   /dm username message
-    else if (data.startsWith('/dm')) {
+    if (data.startsWith('/dm')) {
       let recipient = data.split(' ')[1].toString();
       console.log(`recipient: `, recipient);
       let message = data.slice(data.indexOf(' ', 5));
@@ -43,13 +43,29 @@ server.on('connection', (socket) => {
       console.log(`recipientpool username: `, recipientToWrite.username);
       recipientToWrite.write(message);
     }
+
+    //allows user to use the /troll command
+    if (data.startsWith('/troll')) {
+
+      let splitMsg = data.split(' ');
+
+      if (splitMsg < 2) return socket.write('\nPlease enter a message after /troll');
+
+      let trollMsg = splitMsg.splice(2).reduce((acc, cur) => acc + cur);
+
+      let num = parseInt(splitMsg[1]);
+      for (var i = 0; i < num; i++) {
+        clientPool.forEach((word) => word.write(`${socket.username}: ${trollMsg}`));
+      }
+    }
+
     //this allows the user to type /quit and it will end the connection and remove them from the clientPool
-    else if (data.startsWith('/quit')) {
+    if (data.startsWith('/quit')) {
       socket.end();
       return handleDisconnect;
     }
     //this prints the user a menu of commands to use
-    else if (data.startsWith('/menu')) {
+    if (data.startsWith('/menu')) {
       socket.write(`:MENU:\nChanging your username\n/nick yourNewNameHere\n\nSending a direct message:\n/dm recipientUserName yourMessage\n\nQuit the chatroom:\n/quit\n\nEnjoy!`);
     }
     //this prints the chat message to all users
